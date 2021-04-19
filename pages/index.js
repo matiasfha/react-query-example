@@ -1,106 +1,9 @@
-import Link from "next/link";
 import React from "react";
 import tw, { styled } from "twin.macro";
-import useTodos from "./hooks/useTodos";
-
-const BASE_ID = "appy79pGZl0D8nLjr";
-const baseURL = `https://api.airtable.com/v0/${BASE_ID}/Table%201`;
-
-const useUpdateTodo = (todo) => {
-  const [data, setData] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
-  const { id } = todo;
-  const getUrl = React.useCallback(() => {
-    return `${baseURL}/${id}/?api_key=${process.env.NEXT_PUBLIC_AIRTABLE_KEY}`;
-  }, [id]);
-
-  React.useEffect(() => {
-    setIsLoading(true);
-    fetch(getUrl(), {
-      method: "PATCH",
-      body: JSON.stringify(todo)
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setData(res);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setIsError(true);
-      });
-  }, [getUrl]);
-  return {
-    data,
-    isLoading,
-    isError
-  };
-};
-
-const useCreateTodo = () => {
-  const [data, setData] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
-
-  const getUrl = React.useCallback(() => {
-    return `${baseURL}/?api_key=${process.env.NEXT_PUBLIC_AIRTABLE_KEY}`;
-  }, []);
-
-  const mutateAsync = (data) => {
-    setIsLoading(true);
-    fetch(getUrl(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    })
-      .then((res) => {
-        res.json();
-      })
-      .then((res) => {
-        setData(res);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setIsError(true);
-      });
-  };
-  return {
-    data,
-    isLoading,
-    isError,
-    mutateAsync
-  };
-};
-
-const useGetTodo = (id) => {
-  const [data, setData] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState(false);
-
-  const getUrl = React.useCallback(() => {
-    return `${baseURL}/${id}/?api_key=${process.env.NEXT_PUBLIC_AIRTABLE_KEY}`;
-  }, [id]);
-
-  React.useEffect(() => {
-    setIsLoading(true);
-    fetch(getUrl())
-      .then((res) => res.json())
-      .then((res) => {
-        setData(res);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setIsError(true);
-      });
-  }, [getUrl]);
-  return {
-    data,
-    isLoading,
-    isError
-  };
-};
+import useTodos from "../src/hooks/useTodos";
+import useCreateTodo from '../src/hooks/useCreateTodo';
+import useUpdateTodo from '../src/hooks/useUpdateTodo';
+import useDeleteTodo from '../src/hooks/useDeleteTodo';
 
 const Page = tw.div`
 h-screen w-screen flex items-center justify-center bg-indigo-300 font-sans
@@ -127,7 +30,7 @@ const Item = styled.li`
   p {
     ${tw`w-full text-gray-900`}
     ${(props) =>
-      props.status === "Done" ? tw`line-through text-green-600` : ""}
+    props.status === "Done" ? tw`line-through text-green-600` : ""}
   }
 `;
 const BtnDone = tw.button`
@@ -145,18 +48,55 @@ flex-shrink-0 p-2 ml-4 mr-2 border-2 rounded hover:text-white text-gray-600 bord
 const Ul = tw.ul`
   mt-8
 `;
-const List = ({ items }) => {
+
+const Todo = ({ todo, onRemove }) => {
+  const [state, setState] = React.useState(todo)
+  const [update, updateInfo] = useUpdateTodo()
+
+
+  const { data, isSuccess } = updateInfo
+
+  React.useEffect(() => {
+    if (data && isSuccess) {
+      setState(data)
+    }
+
+  }, [isSuccess])
+
+  const setDone = async () => {
+    await update({
+      id: todo.id,
+      status: 'Done',
+      title: todo.title
+    })
+
+  }
+
+  const setUnDone = async () => {
+    await update({
+      id: todo.id,
+      status: 'Todo',
+      title: todo.Title
+    })
+  }
+
+
+  return (
+    <Item status={state.status}>
+      <p>{state.title}</p>
+      {state.status === "Todo" ? <BtnDone onClick={setDone}>Done</BtnDone> : null}
+      {state.status === "Done" ? <BtnNotDone onClick={setUnDone}>Not Done</BtnNotDone> : null}
+      <BtnRemove onClick={() => onRemove(state.id)}>Remove</BtnRemove>
+    </Item>
+
+  )
+}
+const List = ({ items, onRemove }) => {
   return (
     <Ul>
       {items.map((item) => {
-        const status = item.fields.Status;
         return (
-          <Item key={item.id} status={status}>
-            <p>{item.fields.Title}</p>
-            {status === "Todo" ? <BtnDone>Done</BtnDone> : null}
-            {status === "Done" ? <BtnNotDone>Not Done</BtnNotDone> : null}
-            <BtnRemove>Remove</BtnRemove>
-          </Item>
+          <Todo key={item.id} todo={item} onRemove={onRemove} />
         );
       })}
     </Ul>
@@ -165,26 +105,26 @@ const List = ({ items }) => {
 
 export default function IndexPage() {
   const { isLoading, data, fetch } = useTodos();
-  const { mutateAsync } = useCreateTodo();
-
+  const { mutate, ...state } = useCreateTodo();
+  const [remove, removeInfo] = useDeleteTodo()
   const todoRef = React.useRef(null);
   const submit = async () => {
-    if (todoRef.current) {
-      const Title = todoRef.current.value;
-      await mutateAsync({
-        fields: {
-          Title,
-          Status: "Todo"
-        }
+    if (todoRef.current?.value !== '') {
+      const title = todoRef.current.value;
+      await mutate({
+        title
       });
-      fetch();
+      todoRef.current.value = '';
+      fetch(); // Refetch
     }
   };
 
-  React.useEffect(() => {
-    fetch();
-  }, [fetch]);
 
+  const onRemove = async (todoId) => {
+    await remove(todoId)
+    fetch()
+  }
+  console.log({ data, removeInfo })
   return (
     <Page>
       <Container>
@@ -193,7 +133,8 @@ export default function IndexPage() {
           <input placeholder="Tasks" ref={todoRef} />
           <button onClick={submit}>Add</button>
         </InputContainer>
-        {isLoading ? "...Loading" : <List items={data} />}
+        {isLoading ? "...Loading" : null}
+        <List items={data || []} onRemove={onRemove} />
       </Container>
     </Page>
   );

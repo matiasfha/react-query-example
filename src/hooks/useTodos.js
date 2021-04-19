@@ -6,18 +6,17 @@ export default function usePosts() {
     isLoading: true
   });
 
-  const fetch = async () => {
+  const fetch = React.useCallback(async () => {
     setState({ isLoading: true });
     try {
       const data = await axios.get("/api/todos").then((res) => {
-        console.log(res);
-        return res.data;
+        return res.data
       });
       setState({ isSuccess: true, data });
     } catch (error) {
       setState({ isError: true, error });
     }
-  };
+  }, [])
 
   React.useEffect(() => {
     fetch();

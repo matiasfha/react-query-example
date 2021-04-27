@@ -1,28 +1,9 @@
 import React from "react";
 import axios from "axios";
-import useFetchState from './useFetchState'
+import { useQuery } from 'react-query'
 
-export default function usePosts() {
-  const { state, startFetch, success, error } = useFetchState()
-  const refetch = React.useCallback(async () => {
-    startFetch()
-    try {
-      const data = await axios.get("/api/todos").then((res) => {
-        return res.data
-      });
-      success(data)
-    } catch (e) {
-      console.log(e)
-      error(e)
-    }
-  }, [])
+const fetchTodos = () => axios.get('/api/todos').then(res => res.data)
 
-  React.useEffect(() => {
-    refetch();
-  }, []);
-
-  return {
-    ...state,
-    refetch
-  };
+export default function useTodos() {
+  return useQuery('todos', fetchTodos)
 }

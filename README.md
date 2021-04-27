@@ -1,6 +1,13 @@
-# Hello World example
+## useQuery Branch
 
-This example shows the most basic idea behind Next. We have 2 pages: `pages/index.js` and `pages/about.js`. The former responds to `/` requests and the latter to `/about`. Using `next/link` you can add hyperlinks between them with universal routing capabilities. The `day` directory shows that you can have subdirectories.
+In this branch you can see how to setup and add react-query to be used in the project.
+[This PR](https://github.com/matiasfha/react-query-example/pull/2) shows the big difference in code and logic, there is a ton of code removed just by using the `useQuery` hook from the library.
+
+Is important to notice that `useQuery` receives two parameters.
+
+1. **A query key** this is a way to uniquely identify the data inside the cache. in the `useTodos` the key is a string `"todos"` and in `useTodo` the query is made from an array using the `id` of the item. `["todos",todo.id]`
+2. **A promise base function** to retrieve the data we can use any Promise-like function, in this case is an `axios` call.
+
 
 ## Deploy your own
 
@@ -10,12 +17,6 @@ Deploy the example using [Vercel](https://vercel.com):
 
 ## How to use
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example hello-world hello-world-app
-# or
-yarn create next-app --example hello-world hello-world-app
-```
-
-Deploy it to the cloud with [Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+1. Clone this repo
+2. `cd`into the folder
+3. run `yarn dev` 

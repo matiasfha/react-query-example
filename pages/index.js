@@ -47,14 +47,12 @@ export default function IndexPage() {
         title
       });
       todoRef.current.value = '';
-      refetch()
     }
   };
 
 
   const onRemove = async (todoId) => {
     await remove(todoId)
-    refetch()
   }
 
   return (

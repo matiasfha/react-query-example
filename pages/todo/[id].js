@@ -28,16 +28,14 @@ export default function TodoPage() {
             status: 'Done',
             title: data.title
         })
-        refetch()
     }
 
     const setUnDone = async () => {
         await update({
             id: data.id,
             status: 'Todo',
-            title: data.Title
+            title: data.title
         })
-        refetch()
     }
 
 

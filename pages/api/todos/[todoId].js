@@ -1,6 +1,5 @@
-
-var Airtable = require("airtable");
-var base = new Airtable({ apiKey: process.env.NEXT_PUBLIC_AIRTABLE_KEY }).base(
+const Airtable = require("airtable");
+const base = new Airtable({ apiKey: process.env.NEXT_PUBLIC_AIRTABLE_KEY }).base(
     "appy79pGZl0D8nLjr"
 );
 export default async (req, res) => {
@@ -21,17 +20,22 @@ export default async (req, res) => {
 
 async function GET(req, res) {
     const {
-        query: { postId },
+        query: { todoId },
     } = req
-
-    const row = (await db.get()).posts.find((d) => d.id == postId)
-
-    if (!row) {
-        res.status(404)
-        return res.send('Not found')
-    }
-
-    res.json(row)
+    base('Table 1').find(todoId, function (err, record) {
+        if (err) {
+            console.error(err);
+            res.status(500)
+            res.json({ message: 'An unknown error occurred!' })
+            res.end()
+            return;
+        }
+        res.json({
+            id: todoId,
+            status: record.get('Status'),
+            title: record.get('Title')
+        })
+    });
 }
 
 async function PATCH(req, res) {
@@ -68,7 +72,6 @@ async function DELETE(req, res) {
     const {
         query: { todoId },
     } = req
-    console.log({ todoId })
     base('Table 1').destroy([todoId], function (err, record) {
         if (err) {
             console.error(err);

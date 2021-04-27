@@ -1,19 +1,18 @@
 import React from 'react'
 import axios from 'axios'
+import useFetchState from './useFetchState'
 
 export default function useCreateTodo() {
-    const [state, setState] = React.useReducer((_, action) => action, {
-        isIdle: true,
-    })
+    const { state, startFetch, success, error } = useFetchState()
 
     const mutate = React.useCallback(async (todo) => {
-        setState({ isLoading: true })
+        startFetch()
         try {
             const data = axios.post('/api/todos', todo).then((res) => res.data)
-            setState({ isSuccess: true, data })
-        } catch (error) {
-            console.error(error)
-            setState({ isError: true, error })
+            success(data)
+        } catch (e) {
+            console.error(e)
+            error(e)
         }
     }, [])
 

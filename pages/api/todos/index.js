@@ -1,5 +1,5 @@
-var Airtable = require("airtable");
-var base = new Airtable({ apiKey: process.env.NEXT_PUBLIC_AIRTABLE_KEY }).base(
+const Airtable = require("airtable");
+const base = new Airtable({ apiKey: process.env.NEXT_PUBLIC_AIRTABLE_KEY }).base(
   "appy79pGZl0D8nLjr"
 );
 
@@ -33,17 +33,13 @@ async function POST(req, res) {
       res.end()
     }
     const todos = records.map(function (record) {
-      return ({ id: record.id, status: record.get('Status'), title: record.get('Title') });
+      return ({ id: record.id, status: record.get('Status'), title: record.get('Title'), description: record.get('Description') });
     });
     res.json(todos);
   });
 }
 
 async function GET(req, res) {
-  const {
-    query: { pageOffset, pageSize }
-  } = req;
-
   const todos = [];
 
   return base('Table 1').select({
@@ -54,7 +50,7 @@ async function GET(req, res) {
     // This function (`page`) will get called for each page of records.
 
     records.forEach(function (record) {
-      todos.push({ id: record.id, status: record.get('Status'), title: record.get('Title') });
+      todos.push({ id: record.id, status: record.get('Status'), title: record.get('Title'), description: record.get('Description') });
     });
 
     // To fetch the next page of records, call `fetchNextPage`.

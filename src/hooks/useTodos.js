@@ -1,29 +1,28 @@
 import React from "react";
 import axios from "axios";
+import useFetchState from './useFetchState'
 
 export default function usePosts() {
-  const [state, setState] = React.useReducer((_, action) => action, {
-    isLoading: true
-  });
-
-  const fetch = React.useCallback(async () => {
-    setState({ isLoading: true });
+  const { state, startFetch, success, error } = useFetchState()
+  const refetch = React.useCallback(async () => {
+    startFetch()
     try {
       const data = await axios.get("/api/todos").then((res) => {
         return res.data
       });
-      setState({ isSuccess: true, data });
-    } catch (error) {
-      setState({ isError: true, error });
+      success(data)
+    } catch (e) {
+      console.log(e)
+      error(e)
     }
   }, [])
 
   React.useEffect(() => {
-    fetch();
+    refetch();
   }, []);
 
   return {
     ...state,
-    fetch
+    refetch
   };
 }

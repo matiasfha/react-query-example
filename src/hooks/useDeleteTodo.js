@@ -1,21 +1,20 @@
-
 import React from 'react'
 import axios from 'axios'
+import useFetchState from './useFetchState'
 
 export default function useDeleteTOdo() {
-    const [state, setState] = React.useState({
-        isIdle: true,
-    })
+    const { state, startFetch, success, error } = useFetchState()
 
     const mutate = React.useCallback(async (todoId) => {
-        setState({ isLoading: true })
+        startFetch()
         try {
             const data = await axios.delete(`/api/todos/${todoId}`).then((res) => res.data)
-            setState({ isSuccess: true, data })
-        } catch (error) {
-            setState({ isError: true, error })
+            success(data)
+        } catch (e) {
+            console.error(e)
+            error(e)
         }
     }, [])
 
-    return [mutate, state]
+    return { mutate, ...state }
 }

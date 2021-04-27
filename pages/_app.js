@@ -1,9 +1,12 @@
 import { GlobalStyles } from "twin.macro";
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+const queryClient = new QueryClient()
 const App = ({ Component, pageProps }) => (
-  <div>
+  <QueryClientProvider client={queryClient}>
     <GlobalStyles />
     <Component {...pageProps} />
-  </div>
+
+  </QueryClientProvider>
 );
 
 export default App;

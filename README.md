@@ -1,6 +1,16 @@
-# Hello World example
 
-This example shows the most basic idea behind Next. We have 2 pages: `pages/index.js` and `pages/about.js`. The former responds to `/` requests and the latter to `/about`. Using `next/link` you can add hyperlinks between them with universal routing capabilities. The `day` directory shows that you can have subdirectories.
+## Optimistic updates Branch
+
+Optimistic updates are a technique meant to improve the UX by updating the cached data to represent the desired change (add, update, remove) before the real change happens in the backend layer.
+
+react-query offers a simple way to implement this technique by tapping into the second parameter accepted by `useMutation`. This is a configuration object that enables us to access to some "lifecycle methods".
+- `onMutate` it triggers at same time mutation is trigger, here is where the optimistic update happens
+- `onError` it triggers when an error in the promise happens
+- `onSettled` it triggers when the promise call is done doesn't matter if in an error or success state. This is the place to refetch the data (invalidateQueries)
+
+
+[This PR](https://github.com/matiasfha/react-query-example/pull/4) shows the changes required to enable the optimistic updates
+
 
 ## Deploy your own
 
@@ -10,12 +20,6 @@ Deploy the example using [Vercel](https://vercel.com):
 
 ## How to use
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example hello-world hello-world-app
-# or
-yarn create next-app --example hello-world hello-world-app
-```
-
-Deploy it to the cloud with [Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+1. Clone this repo
+2. `cd`into the folder
+3. run `yarn dev` 

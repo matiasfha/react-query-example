@@ -18,7 +18,7 @@ export const Back = tw.a`
 export default function TodoPage() {
     const router = useRouter()
     const { id: todoId } = router.query
-    const { isLoading, data } = useTodo(todoId);
+    const { isLoading, data, refetch } = useTodo(todoId);
     const { mutate: remove } = useDeleteTodo()
     const { mutate: update } = useUpdateTodo()
 
@@ -28,20 +28,20 @@ export default function TodoPage() {
             status: 'Done',
             title: data.title
         })
-
     }
 
     const setUnDone = async () => {
         await update({
             id: data.id,
             status: 'Todo',
-            title: data.Title
+            title: data.title
         })
     }
 
 
     const onRemove = async (todoId) => {
-        remove(todoId)
+        await remove(todoId)
+        router.push('/')
     }
 
     return (

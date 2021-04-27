@@ -1,29 +1,9 @@
 import React from "react";
 import axios from "axios";
+import { useQuery } from 'react-query'
 
-export default function usePosts() {
-  const [state, setState] = React.useReducer((_, action) => action, {
-    isLoading: true
-  });
+const fetchTodos = () => axios.get('/api/todos').then(res => res.data)
 
-  const fetch = React.useCallback(async () => {
-    setState({ isLoading: true });
-    try {
-      const data = await axios.get("/api/todos").then((res) => {
-        return res.data
-      });
-      setState({ isSuccess: true, data });
-    } catch (error) {
-      setState({ isError: true, error });
-    }
-  }, [])
-
-  React.useEffect(() => {
-    fetch();
-  }, []);
-
-  return {
-    ...state,
-    fetch
-  };
+export default function useTodos() {
+  return useQuery('todos', fetchTodos)
 }

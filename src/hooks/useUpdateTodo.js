@@ -1,6 +1,5 @@
 import React from 'react'
 import axios from 'axios'
-import useFetchState from './useFetchState'
 import { useMutation } from 'react-query'
 
 const updateTodo = (todo) => axios

@@ -5,5 +5,5 @@ import { useQuery } from 'react-query'
 export const fetchTodo = (todoId) => axios.get(`/api/todos/${todoId}`).then((res => res.data))
 
 export default function useTodo(todoId) {
-    return useQuery(['todo', todoId], () => fetchTodo(todoId))
+    return useQuery(['todos', todoId], () => fetchTodo(todoId))
 }

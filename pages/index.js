@@ -36,7 +36,7 @@ const List = ({ items, onRemove }) => {
 };
 
 export default function IndexPage() {
-  const { isLoading, data } = useTodos();
+  const { isLoading, data, refetch } = useTodos();
   const { mutate } = useCreateTodo();
   const { mutate: remove } = useDeleteTodo()
   const todoRef = React.useRef(null);
@@ -52,7 +52,8 @@ export default function IndexPage() {
 
 
   const onRemove = async (todoId) => {
-    remove(todoId)
+    await remove(todoId)
+    refetch()
   }
 
   return (

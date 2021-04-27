@@ -43,10 +43,11 @@ export default function IndexPage() {
   const submit = async () => {
     if (todoRef.current?.value !== '') {
       const title = todoRef.current.value;
-      mutate({
+      await mutate({
         title
       });
       todoRef.current.value = '';
+      refetch()
     }
   };
 

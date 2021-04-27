@@ -1,20 +1,9 @@
 import React from 'react'
 import axios from 'axios'
-import useFetchState from './useFetchState'
+import { useMutation } from 'react-query';
 
-export default function useDeleteTOdo() {
-    const { state, startFetch, success, error } = useFetchState()
+const deleteTodo = (todoId) => axios.delete(`/api/todos/${todoId}`).then((res) => res.data)
 
-    const mutate = React.useCallback(async (todoId) => {
-        startFetch()
-        try {
-            const data = await axios.delete(`/api/todos/${todoId}`).then((res) => res.data)
-            success(data)
-        } catch (e) {
-            console.error(e)
-            error(e)
-        }
-    }, [])
-
-    return { mutate, ...state }
+export default function useDeleteTodo() {
+    return useMutation(todoId => deleteTodo(todoId))
 }
